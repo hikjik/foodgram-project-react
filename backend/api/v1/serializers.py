@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.models import Tag
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework.validators import UniqueValidator
+
+from recipes.models import Ingredient, Tag
 
 User = get_user_model()
 
@@ -60,3 +61,9 @@ class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
         fields = ["id", "name", "color", "slug"]
+
+
+class IngredientSerializer(ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = ["id", "name", "measurement_unit"]

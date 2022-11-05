@@ -33,3 +33,28 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Ingredient(models.Model):
+    name = models.CharField(
+        max_length=128,
+        verbose_name="Название ингридиента",
+    )
+    measurement_unit = models.CharField(
+        max_length=16,
+        verbose_name="Единицы измерения",
+    )
+
+    class Meta:
+        ordering = ["id"]
+        verbose_name = "Ингридиент"
+        verbose_name_plural = "Ингридиенты"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "measurement_unit"],
+                name="unique ingredient",
+            )
+        ]
+
+    def __str__(self):
+        return self.name
