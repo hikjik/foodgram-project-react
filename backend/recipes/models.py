@@ -1,7 +1,10 @@
 import re
 
-from django.core.validators import RegexValidator
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -58,3 +61,89 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Recipe(models.Model):
+    tags = models.ManyToManyField(
+        Tag,
+        verbose_name="Теги рецепта",
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="recipes",
+        verbose_name="Автор рецепта",
+    )
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through="RecipeIngredient",
+        verbose_name="Ингредиенты рецепта",
+    )
+    name = models.CharField(
+        max_length=200,
+        verbose_name="Название рецепта",
+    )
+    image = models.ImageField(
+        upload_to="recipes/images",
+        verbose_name="Изображение рецепта",
+    )
+    text = models.TextField(
+        verbose_name="Описание рецепта",
+    )
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(
+                limit_value=1,
+                message="Время приготовления должно быть больше 1 минуты",
+            )
+        ],
+        verbose_name="Время приготовления минутах",
+    )
+
+    class Meta:
+        ordering = ["id"]
+        verbose_name = "Рецепт"
+        verbose_name_plural = "Рецепты"
+
+    def __str__(self):
+        return self.name
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name="Рецепт",
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        verbose_name="Ингридиент",
+    )
+    amount = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(
+                limit_value=1,
+                message="Количество должно быть больше 1",
+            ),
+        ],
+        verbose_name="Количество",
+    )
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name = "Рецепт и ингридиент"
+        verbose_name_plural = "Рецепты и ингридиенты"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["recipe", "ingredient"],
+                name="unique recipe ingredient",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"Рецепт {self.recipe}, "
+            f"Ингредиент: {self.ingredient}, "
+            f"Количество: {self.amount}"
+        )
