@@ -97,7 +97,7 @@ class Recipe(models.Model):
                 message="Время приготовления должно быть больше 1 минуты",
             )
         ],
-        verbose_name="Время приготовления минутах",
+        verbose_name="Время приготовления в минутах",
     )
 
     class Meta:
@@ -114,11 +114,13 @@ class RecipeIngredient(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         verbose_name="Рецепт",
+        related_name="recipes_ingredients",
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name="Ингридиент",
+        related_name="recipes_ingredients",
     )
     amount = models.PositiveSmallIntegerField(
         validators=[
