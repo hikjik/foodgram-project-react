@@ -60,14 +60,15 @@ class RecipeViewSet(ModelViewSet):
             user.favorites.add(recipe)
             serializer = self.get_serializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == "DELETE":
+
+        if request.method == "DELETE":
             if not user.favorites.filter(id=pk).exists():
                 data = {"errors": "Рецепта нет в избранном."}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
             user.favorites.remove(recipe)
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
         methods=["POST", "DELETE"],
@@ -85,14 +86,15 @@ class RecipeViewSet(ModelViewSet):
             user.carts.add(recipe)
             serializer = self.get_serializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == "DELETE":
+
+        if request.method == "DELETE":
             if not user.carts.filter(id=pk).exists():
                 data = {"errors": "Рецепта нет в корзине."}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
             user.carts.remove(recipe)
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(methods=["GET"], detail=False)
     def download_shopping_cart(self, request):
@@ -151,11 +153,12 @@ class SubscriptionViewSet(GenericViewSet):
             Follow.objects.create(user=user, author=author)
             serializer = self.get_serializer(author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        elif request.method == "DELETE":
+
+        if request.method == "DELETE":
             if not subscription.exists():
                 data = {"errors": "Вы не подписаны на указанного автора."}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
