@@ -149,3 +149,32 @@ class RecipeIngredient(models.Model):
             f"Ингредиент: {self.ingredient}, "
             f"Количество: {self.amount}"
         )
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="follower",
+        verbose_name="Подписчик",
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="following",
+        verbose_name="Автор",
+    )
+
+    def __str__(self):
+        return f"Подписчик: {self.user}, Автор: {self.author}"
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "author"],
+                name="unique follow",
+            )
+        ]
