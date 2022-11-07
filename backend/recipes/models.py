@@ -103,6 +103,11 @@ class Recipe(models.Model):
         auto_now_add=True,
         verbose_name="Дата публикации рецепта",
     )
+    favorite = models.ManyToManyField(
+        User,
+        related_name="favorites",
+        verbose_name="В избранном у пользователей",
+    )
 
     class Meta:
         ordering = ["-pub_date"]

@@ -11,7 +11,8 @@ from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
 
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
-                          TagSerializer, UserSubscribeSerializer)
+                          ShortRecipeSerializer, TagSerializer,
+                          UserSubscribeSerializer)
 
 User = get_user_model()
 
@@ -34,6 +35,31 @@ class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     queryset = Recipe.objects.all()
     permission_classes = [IsOwnerOrReadOnly]
+
+    @action(
+        methods=["POST", "DELETE"],
+        detail=True,
+        serializer_class=ShortRecipeSerializer,
+    )
+    def favorite(self, request, pk):
+        user = self.request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+
+        if request.method == "POST":
+            if user.favorites.filter(id=pk).exists():
+                data = {"errors": "Рецепт уже есть в избранном."}
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            user.favorites.add(recipe)
+            serializer = self.get_serializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif request.method == "DELETE":
+            if not user.favorites.filter(id=pk).exists():
+                data = {"errors": "Рецепта нет в избранном."}
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            user.favorites.remove(recipe)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class SubscriptionViewSet(GenericViewSet):
@@ -72,5 +98,5 @@ class SubscriptionViewSet(GenericViewSet):
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
