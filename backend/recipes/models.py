@@ -108,6 +108,11 @@ class Recipe(models.Model):
         related_name="favorites",
         verbose_name="В избранном у пользователей",
     )
+    cart = models.ManyToManyField(
+        User,
+        related_name="carts",
+        verbose_name="В корзине у пользователей",
+    )
 
     class Meta:
         ordering = ["-pub_date"]

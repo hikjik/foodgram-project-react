@@ -61,6 +61,31 @@ class RecipeViewSet(ModelViewSet):
         else:
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    @action(
+        methods=["POST", "DELETE"],
+        detail=True,
+        serializer_class=ShortRecipeSerializer,
+    )
+    def shopping_cart(self, request, pk):
+        user = self.request.user
+        recipe = get_object_or_404(Recipe, id=pk)
+
+        if request.method == "POST":
+            if user.carts.filter(id=pk).exists():
+                data = {"errors": "Рецепт уже в корзине."}
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            user.carts.add(recipe)
+            serializer = self.get_serializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        elif request.method == "DELETE":
+            if not user.carts.filter(id=pk).exists():
+                data = {"errors": "Рецепта нет в корзине."}
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            user.carts.remove(recipe)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 class SubscriptionViewSet(GenericViewSet):
     serializer_class = UserSubscribeSerializer
