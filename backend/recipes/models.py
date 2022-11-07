@@ -11,12 +11,12 @@ class Tag(models.Model):
     name = models.CharField(
         max_length=32,
         unique=True,
-        verbose_name="Название тега",
+        verbose_name="Название",
     )
     slug = models.SlugField(
         max_length=32,
         unique=True,
-        verbose_name="Slug тега",
+        verbose_name="Slug",
     )
     color = models.CharField(
         max_length=7,
@@ -26,7 +26,7 @@ class Tag(models.Model):
                 "Введите корректный цветовой hex-код (например, #49B64E)",
             ),
         ],
-        verbose_name="Цвет тега",
+        verbose_name="Цвет",
     )
 
     class Meta:
@@ -41,7 +41,7 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=128,
-        verbose_name="Название ингридиента",
+        verbose_name="Название",
     )
     measurement_unit = models.CharField(
         max_length=16,
@@ -66,29 +66,29 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     tags = models.ManyToManyField(
         Tag,
-        verbose_name="Теги рецепта",
+        verbose_name="Теги",
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="recipes",
-        verbose_name="Автор рецепта",
+        verbose_name="Автор",
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         through="RecipeIngredient",
-        verbose_name="Ингредиенты рецепта",
+        verbose_name="Ингредиенты",
     )
     name = models.CharField(
         max_length=200,
-        verbose_name="Название рецепта",
+        verbose_name="Название",
     )
     image = models.ImageField(
         upload_to="recipes/images",
-        verbose_name="Изображение рецепта",
+        verbose_name="Изображение",
     )
     text = models.TextField(
-        verbose_name="Описание рецепта",
+        verbose_name="Описание",
     )
     cooking_time = models.PositiveSmallIntegerField(
         validators=[
@@ -101,7 +101,7 @@ class Recipe(models.Model):
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Дата публикации рецепта",
+        verbose_name="Дата публикации",
     )
     favorite = models.ManyToManyField(
         User,
