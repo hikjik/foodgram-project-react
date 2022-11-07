@@ -1,6 +1,10 @@
+import csv
+
 from django.contrib.auth import get_user_model
+from django.db.models import F, Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from recipes.models import Follow, Ingredient, Recipe, Tag
+from recipes.models import Follow, Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -42,7 +46,7 @@ class RecipeViewSet(ModelViewSet):
         serializer_class=ShortRecipeSerializer,
     )
     def favorite(self, request, pk):
-        user = self.request.user
+        user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
 
         if request.method == "POST":
@@ -67,7 +71,7 @@ class RecipeViewSet(ModelViewSet):
         serializer_class=ShortRecipeSerializer,
     )
     def shopping_cart(self, request, pk):
-        user = self.request.user
+        user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
 
         if request.method == "POST":
@@ -85,6 +89,32 @@ class RecipeViewSet(ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=["GET"], detail=False)
+    def download_shopping_cart(self, request):
+        user = request.user
+        if not user.carts.exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        ingredients = (
+            RecipeIngredient.objects.filter(
+                recipe__in=user.carts.all(),
+            )
+            .values(
+                name=F("ingredient__name"),
+                unit=F("ingredient__measurement_unit"),
+            )
+            .annotate(amount=Sum("amount"))
+        )
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = "attachment;filename=cart.csv"
+
+        writer = csv.writer(response)
+        writer.writerow(ingredients.first().keys())
+        for ingredient in list(ingredients):
+            writer.writerow(ingredient.values())
+        return response
 
 
 class SubscriptionViewSet(GenericViewSet):
