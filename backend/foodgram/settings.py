@@ -122,3 +122,5 @@ DJOSER = {
     },
     "LOGIN_FIELD": "email",
 }
+
+CSRF_TRUSTED_ORIGINS = ["https://foodgram.zapto.org"]
