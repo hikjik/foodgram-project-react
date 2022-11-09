@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import FilterSet, filters
-from recipes.models import Recipe
+from recipes.models import Recipe, Tag
 
 User = get_user_model()
 
@@ -15,7 +15,11 @@ class RecipeFilter(FilterSet):
         method="filter_is_in_shopping_cart"
     )
     author = filters.ModelChoiceFilter(queryset=User.objects.all())
-    tags = filters.AllValuesMultipleFilter(field_name="tags__slug")
+    tags = filters.ModelMultipleChoiceFilter(
+        queryset=Tag.objects.all(),
+        field_name="tags__slug",
+        to_field_name="slug",
+    )
 
     def filter_is_favorited(self, queryset, name, value):
         if self.request.user.is_authenticated and value:
