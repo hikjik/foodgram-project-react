@@ -8,13 +8,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import Follow, Ingredient, Recipe, RecipeIngredient, Tag
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
                                      ReadOnlyModelViewSet)
 
-from .filters import RecipeFilter
+from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer, RecipeSerializer,
                           ShortRecipeSerializer, TagSerializer,
@@ -34,8 +33,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     permission_classes = [AllowAny]
-    filter_backends = [SearchFilter]
-    search_fields = ["^name"]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IngredientFilter
     pagination_class = None
 
 

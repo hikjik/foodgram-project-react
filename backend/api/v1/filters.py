@@ -1,11 +1,15 @@
+import django_filters as filters
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import FilterSet, filters
 from recipes.models import Recipe
 
 User = get_user_model()
 
 
-class RecipeFilter(FilterSet):
+class IngredientFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name="name", lookup_expr="istartswith")
+
+
+class RecipeFilter(filters.FilterSet):
     is_favorited = filters.BooleanFilter(method="filter_is_favorited")
     is_in_shopping_cart = filters.BooleanFilter(
         method="filter_is_in_shopping_cart"
