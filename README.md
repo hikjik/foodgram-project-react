@@ -1,4 +1,4 @@
-![Foodgram Workflow](https://github.com/hikjik/foodgram/actions/workflows/foodgram_workflow.yml/badge.svg)
+![Foodgram Workflow](https://github.com/hikjik/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
 
 # Продуктовый помощник Foodgram
 
