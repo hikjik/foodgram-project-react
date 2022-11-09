@@ -1,13 +1,21 @@
-import re
-
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 
 User = get_user_model()
 
 
 class Tag(models.Model):
+    class Color(models.TextChoices):
+        RED = "#FF0000", "Красный"
+        ORANGE = "#FF9933", "Оранжевый"
+        YELLOW = "#FFFF00", "Желтый"
+        GREEN = "#00FF00", "Зеленый"
+        BLUE = "#0000FF", "Синий"
+        PURPLE = "#6600CC", "Фиолетовый"
+        WHITE = "#FFFFFF", "Белый"
+        BLACK = "#000000", "Черный"
+
     name = models.CharField(
         max_length=32,
         unique=True,
@@ -19,13 +27,9 @@ class Tag(models.Model):
         verbose_name="Slug",
     )
     color = models.CharField(
-        max_length=7,
-        validators=[
-            RegexValidator(
-                re.compile("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"),
-                "Введите корректный цветовой hex-код (например, #49B64E)",
-            ),
-        ],
+        max_length=10,
+        choices=Color.choices,
+        default=Color.RED,
         verbose_name="Цвет",
     )
 
