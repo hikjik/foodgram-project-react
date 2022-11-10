@@ -2,8 +2,11 @@ from django.contrib.auth import get_user_model
 from django.db.models import F
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
-from rest_framework.serializers import (ListSerializer, ModelSerializer,
-                                        SerializerMethodField)
+from rest_framework.serializers import (
+    ListSerializer,
+    ModelSerializer,
+    SerializerMethodField,
+)
 from rest_framework.validators import UniqueValidator, ValidationError
 
 from .fields import Base64ImageField
@@ -221,7 +224,7 @@ class RecipeSerializer(ModelSerializer):
 
         recipe = Recipe.objects.create(**validated_data)
 
-        self._set_tags(recipe, tags)
+        recipe.tags.set(tags)
         self._set_ingredients(recipe, ingredients)
 
         return recipe
@@ -233,15 +236,10 @@ class RecipeSerializer(ModelSerializer):
         recipe.cooking_time = validated_data.get(
             "cooking_time", recipe.cooking_time
         )
-        self._set_tags(recipe, validated_data.get("tags"))
+        recipe.tags.set(validated_data.get("tags"))
         self._set_ingredients(recipe, validated_data.get("ingredients"))
         recipe.save()
         return recipe
-
-    @staticmethod
-    def _set_tags(recipe, tags):
-        recipe.tags.clear()
-        recipe.tags.set(tags)
 
     @staticmethod
     def _set_ingredients(recipe, ingredients):
