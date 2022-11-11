@@ -95,7 +95,7 @@ class RecipeViewSet(ModelViewSet):
                 name=F("ingredient__name"),
                 unit=F("ingredient__measurement_unit"),
             )
-            .annotate(amount=Sum("amount"))
+            .annotate(total_amount=Sum("amount"))
         )
 
         response = HttpResponse(content_type="text/csv")
