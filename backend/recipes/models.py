@@ -34,7 +34,7 @@ class Tag(models.Model):
     )
 
     class Meta:
-        ordering = ["id"]
+        ordering = ("id",)
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
 
@@ -53,7 +53,7 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        ordering = ["id"]
+        ordering = ("id",)
         verbose_name = "Ингридиент"
         verbose_name_plural = "Ингридиенты"
         constraints = [
@@ -119,7 +119,7 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ["-pub_date"]
+        ordering = ("-pub_date",)
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
 
@@ -151,7 +151,7 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
-        ordering = ["-id"]
+        ordering = ("-id",)
         verbose_name = "Рецепт и ингридиент"
         verbose_name_plural = "Рецепты и ингридиенты"
         constraints = [
@@ -187,7 +187,7 @@ class Follow(models.Model):
         return f"Подписчик: {self.user}, Автор: {self.author}"
 
     class Meta:
-        ordering = ["-id"]
+        ordering = ("-id",)
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
         constraints = [

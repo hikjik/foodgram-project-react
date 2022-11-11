@@ -25,15 +25,15 @@ User = get_user_model()
 class TagsViewSet(ReadOnlyModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = (AllowAny,)
     pagination_class = None
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
-    permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend]
+    permission_classes = (AllowAny,)
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
     pagination_class = None
 
@@ -41,12 +41,12 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     queryset = Recipe.objects.all()
-    permission_classes = [IsOwnerOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
+    permission_classes = (IsOwnerOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     @action(
-        methods=["POST", "DELETE"],
+        methods=("POST", "DELETE"),
         detail=True,
         serializer_class=ShortRecipeSerializer,
     )
@@ -55,7 +55,7 @@ class RecipeViewSet(ModelViewSet):
         return self._add_or_remove_recipe(request.user.favorites, recipe)
 
     @action(
-        methods=["POST", "DELETE"],
+        methods=("POST", "DELETE"),
         detail=True,
         serializer_class=ShortRecipeSerializer,
     )
@@ -63,7 +63,7 @@ class RecipeViewSet(ModelViewSet):
         recipe = get_object_or_404(Recipe, id=pk)
         return self._add_or_remove_recipe(request.user.carts, recipe)
 
-    @action(methods=["GET"], detail=False)
+    @action(methods=("GET",), detail=False)
     def download_shopping_cart(self, request):
         user = request.user
         if not user.carts.exists():
@@ -113,16 +113,16 @@ class RecipeViewSet(ModelViewSet):
 class SubscriptionViewSet(GenericViewSet):
     serializer_class = UserSubscribeSerializer
     queryset = User.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = (IsAuthenticated,)
 
-    @action(methods=["GET"], detail=False)
+    @action(methods=("GET",), detail=False)
     def subscriptions(self, request):
         authors = User.objects.filter(following__user=request.user)
         pages = self.paginate_queryset(authors)
         serializer = self.get_serializer(pages, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @action(methods=["POST", "DELETE"], detail=True)
+    @action(methods=("POST", "DELETE"), detail=True)
     def subscribe(self, request, pk):
         user = self.request.user
         author = get_object_or_404(User, id=pk)

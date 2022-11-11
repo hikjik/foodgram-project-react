@@ -19,14 +19,14 @@ class CustomUserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = [
+        fields = (
             "id",
             "email",
             "username",
             "first_name",
             "last_name",
             "is_subscribed",
-        ]
+        )
 
     def get_is_subscribed(self, author):
         user = self.context["request"].user
@@ -39,14 +39,14 @@ class CustomUserSerializer(UserSerializer):
 class CustomUserCreateSerializer(UserCreateSerializer):
     class Meta:
         model = User
-        fields = [
+        fields = (
             "id",
             "email",
             "username",
             "first_name",
             "last_name",
             "password",
-        ]
+        )
         extra_kwargs = {
             "email": {
                 "required": True,
@@ -80,7 +80,7 @@ class LimitedListSerializer(ListSerializer):
 class ShortRecipeSerializer(ModelSerializer):
     class Meta:
         model = Recipe
-        fields = ["id", "name", "image", "cooking_time"]
+        fields = ("id", "name", "image", "cooking_time")
         list_serializer_class = LimitedListSerializer
 
 
@@ -108,13 +108,13 @@ class UserSubscribeSerializer(CustomUserSerializer):
 class TagSerializer(ModelSerializer):
     class Meta:
         model = Tag
-        fields = ["id", "name", "color", "slug"]
+        fields = ("id", "name", "color", "slug")
 
 
 class IngredientSerializer(ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ["id", "name", "measurement_unit"]
+        fields = ("id", "name", "measurement_unit")
 
 
 class RecipeSerializer(ModelSerializer):
@@ -127,7 +127,7 @@ class RecipeSerializer(ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = [
+        fields = (
             "id",
             "tags",
             "author",
@@ -138,7 +138,7 @@ class RecipeSerializer(ModelSerializer):
             "image",
             "text",
             "cooking_time",
-        ]
+        )
 
     def get_ingredients(self, recipe):
         return recipe.ingredients.values(
