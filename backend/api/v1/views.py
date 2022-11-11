@@ -1,3 +1,4 @@
+"""Модуль содержит обработчики запросов к API."""
 import csv
 
 from django.contrib.auth import get_user_model
@@ -23,6 +24,8 @@ User = get_user_model()
 
 
 class TagsViewSet(ReadOnlyModelViewSet):
+    """Вьюсет, позволяющий получить данные модели Tag."""
+
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     permission_classes = (AllowAny,)
@@ -30,6 +33,8 @@ class TagsViewSet(ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
+    """Вьюсет, позволяющий получить данные модели Ingredient."""
+
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     permission_classes = (AllowAny,)
@@ -39,6 +44,12 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
+    """Вьюсет для работы с рецептами.
+
+    Позволяет получать/создавать/редактировать/удалять рецепты,
+    добавлять рецепты в избранное и в корзину, скачивать список покупок.
+    """
+
     serializer_class = RecipeSerializer
     queryset = Recipe.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
@@ -51,6 +62,7 @@ class RecipeViewSet(ModelViewSet):
         serializer_class=ShortRecipeSerializer,
     )
     def favorite(self, request, pk):
+        """Метод добавляет/удаляет рецепт в избранное."""
         recipe = get_object_or_404(Recipe, id=pk)
         return self._add_or_remove_recipe(request.user.favorites, recipe)
 
@@ -60,11 +72,17 @@ class RecipeViewSet(ModelViewSet):
         serializer_class=ShortRecipeSerializer,
     )
     def shopping_cart(self, request, pk):
+        """Метод добавляет/удаляет рецепт в корзину."""
         recipe = get_object_or_404(Recipe, id=pk)
         return self._add_or_remove_recipe(request.user.carts, recipe)
 
     @action(methods=("GET",), detail=False)
     def download_shopping_cart(self, request):
+        """Возвращает список покупок в формате csv.
+
+        В списке должны быть перечислены ингредиенты,
+        необходимые для приготовления блюд, добавленных в корзину пользователя.
+        """
         user = request.user
         if not user.carts.exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -111,12 +129,15 @@ class RecipeViewSet(ModelViewSet):
 
 
 class SubscriptionViewSet(GenericViewSet):
+    """Вьюсет для управления подписками пользователей."""
+
     serializer_class = UserSubscribeSerializer
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated,)
 
     @action(methods=("GET",), detail=False)
     def subscriptions(self, request):
+        """Метод для получения списка подписок."""
         authors = User.objects.filter(following__user=request.user)
         pages = self.paginate_queryset(authors)
         serializer = self.get_serializer(pages, many=True)
@@ -124,6 +145,7 @@ class SubscriptionViewSet(GenericViewSet):
 
     @action(methods=("POST", "DELETE"), detail=True)
     def subscribe(self, request, pk):
+        """Метод создаёт/удаляет подписки на публикации пользователей."""
         user = self.request.user
         author = get_object_or_404(User, id=pk)
         subscription = user.follower.filter(author=author)
