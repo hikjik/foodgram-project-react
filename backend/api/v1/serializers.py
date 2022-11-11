@@ -2,11 +2,8 @@ from django.contrib.auth import get_user_model
 from django.db.models import F
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
-from rest_framework.serializers import (
-    ListSerializer,
-    ModelSerializer,
-    SerializerMethodField,
-)
+from rest_framework.serializers import (ListSerializer, ModelSerializer,
+                                        SerializerMethodField)
 from rest_framework.validators import UniqueValidator, ValidationError
 
 from .fields import Base64ImageField
