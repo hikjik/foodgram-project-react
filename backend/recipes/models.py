@@ -1,3 +1,4 @@
+"""Модуль содержит основные модели проекта."""
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -6,7 +7,15 @@ User = get_user_model()
 
 
 class Tag(models.Model):
+    """Модель Tag для рецептов.
+
+    Описывает метки, с помощью которых пользователи размечают публикации,
+    что упрощает поиск подходящих рецептов.
+    """
+
     class Color(models.TextChoices):
+        """Enum-класс Color перечисляет цвета тегов в hex-кодировке."""
+
         RED = "#FF0000", "Красный"
         ORANGE = "#FF9933", "Оранжевый"
         YELLOW = "#FFFF00", "Желтый"
@@ -34,15 +43,23 @@ class Tag(models.Model):
     )
 
     class Meta:
+        """Meta опции модели Tag."""
+
         ordering = ("id",)
         verbose_name = "Тег"
         verbose_name_plural = "Теги"
 
     def __str__(self):
+        """Строковое представление модели Tag."""
         return self.name
 
 
 class Ingredient(models.Model):
+    """Модель Ingredient.
+
+    Описывает продукты, необходимые для приготовления блюда по рецепту
+    """
+
     name = models.CharField(
         max_length=128,
         verbose_name="Название",
@@ -53,6 +70,8 @@ class Ingredient(models.Model):
     )
 
     class Meta:
+        """Meta опции модели Ingredient."""
+
         ordering = ("id",)
         verbose_name = "Ингридиент"
         verbose_name_plural = "Ингридиенты"
@@ -64,10 +83,16 @@ class Ingredient(models.Model):
         ]
 
     def __str__(self):
+        """Строковое представление модели Ingredient."""
         return self.name
 
 
 class Recipe(models.Model):
+    """Модель Recipe.
+
+    Описывает рецепты, которые пользователи публикуют на сервисе.
+    """
+
     tags = models.ManyToManyField(
         Tag,
         verbose_name="Теги",
@@ -119,15 +144,24 @@ class Recipe(models.Model):
     )
 
     class Meta:
+        """Meta опции модели RecipeIngredient."""
+
         ordering = ("-pub_date",)
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
 
     def __str__(self):
+        """Строковое представление модели Recipe."""
         return self.name
 
 
 class RecipeIngredient(models.Model):
+    """Модель RecipeIngredient.
+
+    Вспомогательная модель, связующая модели Recipe и Ingredient.
+    Хранит дополнительное поле amount - количество ингредиента в рецепте.
+    """
+
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -151,6 +185,8 @@ class RecipeIngredient(models.Model):
     )
 
     class Meta:
+        """Meta опции модели Recipe."""
+
         ordering = ("-id",)
         verbose_name = "Рецепт и ингридиент"
         verbose_name_plural = "Рецепты и ингридиенты"
@@ -162,6 +198,7 @@ class RecipeIngredient(models.Model):
         ]
 
     def __str__(self):
+        """Строковое представление модели RecipeIngredient."""
         return (
             f"Рецепт {self.recipe}, "
             f"Ингредиент: {self.ingredient}, "
@@ -170,6 +207,11 @@ class RecipeIngredient(models.Model):
 
 
 class Follow(models.Model):
+    """Модель Follow.
+
+    Позволяет создавать подписки на публикации пользователей.
+    """
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -184,9 +226,12 @@ class Follow(models.Model):
     )
 
     def __str__(self):
+        """Строковое представление модели Follow."""
         return f"Подписчик: {self.user}, Автор: {self.author}"
 
     class Meta:
+        """Meta опции модели Follow."""
+
         ordering = ("-id",)
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
