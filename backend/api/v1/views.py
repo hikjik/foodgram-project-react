@@ -64,7 +64,15 @@ class RecipeViewSet(ModelViewSet):
     def favorite(self, request, pk):
         """Метод добавляет/удаляет рецепт в избранное."""
         recipe = get_object_or_404(Recipe, id=pk)
-        return self._add_or_remove_recipe(request.user.favorites, recipe)
+        manager = request.user.favorites
+
+        if self.request.method == "POST":
+            return self._add_recipe(manager, recipe)
+
+        if self.request.method == "DELETE":
+            return self._remove_recipe(manager, recipe)
+
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(
         methods=("POST", "DELETE"),
@@ -74,7 +82,15 @@ class RecipeViewSet(ModelViewSet):
     def shopping_cart(self, request, pk):
         """Метод добавляет/удаляет рецепт в корзину."""
         recipe = get_object_or_404(Recipe, id=pk)
-        return self._add_or_remove_recipe(request.user.carts, recipe)
+        manager = request.user.carts
+
+        if self.request.method == "POST":
+            return self._add_recipe(manager, recipe)
+
+        if self.request.method == "DELETE":
+            return self._remove_recipe(manager, recipe)
+
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @action(methods=("GET",), detail=False)
     def download_shopping_cart(self, request):
@@ -107,25 +123,22 @@ class RecipeViewSet(ModelViewSet):
             writer.writerow(ingredient.values())
         return response
 
-    def _add_or_remove_recipe(self, manager, recipe):
-        if self.request.method == "POST":
-            if manager.filter(id=recipe.id).exists():
-                data = {"errors": "Рецепт был добавлен ранее."}
-                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    def _add_recipe(self, manager, recipe):
+        if manager.filter(id=recipe.id).exists():
+            data = {"errors": "Рецепт был добавлен ранее."}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
-            manager.add(recipe)
-            serializer = self.get_serializer(recipe)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        manager.add(recipe)
+        serializer = self.get_serializer(recipe)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if self.request.method == "DELETE":
-            if not manager.filter(id=recipe.id).exists():
-                data = {"errors": "Рецепт не найден."}
-                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    def _remove_recipe(self, manager, recipe):
+        if not manager.filter(id=recipe.id).exists():
+            data = {"errors": "Рецепт не найден."}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
-            manager.remove(recipe)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        manager.remove(recipe)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SubscriptionViewSet(GenericViewSet):
