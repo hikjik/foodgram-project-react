@@ -234,7 +234,7 @@ GET https://foodgram.zapto.org/api/recipes/
 
 - [Сервис Foodgram][1]
 - [Спецификация API][2]
-- [Административная панель Django][3]
+- [Административная панель Django (Логин: admin, пароль: admin)][3]
 - [Дизайн-проект в Figma][4]
 
 [1]: https://foodgram.zapto.org/
