@@ -67,13 +67,9 @@ jobs:
           username: ${{ secrets.YANDEX_CLOUD_USER }}
           key: ${{ secrets.YANDEX_CLOUD_SSH_PRIVATE_KEY }}
           script: |
-            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/foodgram_backend:latest
-            sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/foodgram_frontend:latest
-
             sudo rm -rf foodgram-project-react
             git clone git@github.com:hikjik/foodgram-project-react.git            
             cd foodgram-project-react
-            git checkout dev
             git lfs pull
             cd infra
 
@@ -85,9 +81,11 @@ jobs:
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             echo DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} >> .env
 
-            sudo docker-compose down -v
+            sudo docker-compose stop
+            sudo docker-compose rm backend
+            sudo docker-compose rm frontend
+            sudo docker-compose pull
             sudo docker-compose up -d
-            sudo docker-compose exec backend python manage.py collectstatic --no-input
 
   send_message:
     name: Send Report to Telegram
